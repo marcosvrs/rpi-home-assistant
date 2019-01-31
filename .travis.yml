@@ -1,0 +1,51 @@
+sudo: required
+
+services:
+  - docker
+
+language: bash
+
+env:
+  global:
+    - secure: 7lVvn6CAu3Pxm6loUP1002LaDNv7vB4zzRa8kBlIQwYc9mwouSXvOUvWvrjYldAr9LgUOF5R6AM057lwHtai/7dj5YLzU+vic6xHcQtCHOQ/aup3aPVgDjznYdTwYGu1ERvD0lZzr55dtzpMm1kl3ALETme4p5Kho+sjAqpBNpuVntLL64lwfj0nZG4PM/smopUI6XwKSCZysH/GvjCEMb8cMaJoI9bY5NrJMbbv+vxgeM8PJE86tytew0Lf1W1Y0RcR2QhE0A12kAvrgL32lDZYaCNY7PE1zeqjhlZoEGNxEIeZTW5g83zwvqubfIoSnMpsnnp264WEZC1J2xxINL5Qsd9OyTNtPaEQ2uhY8Kwgk6w+1XvofG6snp5okchplLpNc9JsePCiN1hBR8vKVnqaWCHSUWnlPSJCF/2dBQWlrk9Tl6c+BrgPmGRVfxIOS6/MMec69mW3FOfgHxWNaJLD2Bo7AvbsEeqpLD8mNtldq1sPWnmMYeIWV96I6Cd4rskNb8awCO3InHBWxeO/8Esdu2vgx3MphfkIqxOlBWEKKxQs8m+ahEUDaPb1x9jpqIVLHBE2vxKPx2ee/YHs9tWJcIdc56iHMcwodpU1uwJDH+0B2E8DrXDcBPC0UG1JAgalJoyXeT2H5o5dLKykyBIm9PERuPvOBKkHINhIpSY=
+    - secure: qszMvS7eOfMuvIr8pj597hp6YZaq/1ReToZghmHVjE4KqLT7PDxhoCsSGoc59vcrSNqmS2XCZdlGXVWQx0/HDHqIKv8vJMBZvoUNZdUUZ2ngyy1XFU9VgiYNyV6OzWyZWgJ8mbD2gk4fHOBjWHB1JhEsE8mvFrwR1v/32sB9Ri+HgxTLTs2lgcP1fCkuIP/RbnXl3EQXhGmkxAF6HG/h2eSSdI/pRSa/nk+8Pt52oYcHYhtrFSwMIyEZj2mxujTpxpSb8opP5nLNEv1yjUPh4FWT12bMBYKaTkYSMj5Fo2dlvWE9HW9BYIbFZ8T6WFYzD59Oz0eZK4larNBF2K4sLtcPD9jHAC5fS6Mbjvqypt/3PLdUioLSCktyfrGQB3krNVPjzzlu1dv2BnlI9FaCSVmjVItzBznx1g1TAuwqXCLDsDCF6yRnWvWBqF2YnpjhxIHxW3wi3z8xqSLT1pOzRQWUudn9+cgsxaZhjHxdGwSZPuxDWKCzlv33iwqQttdjfTHJOXKq+4rbwgkn9fn+ZnfyVQhsN73mDwVJLVnR1bA6BlOWGTKW1W5D4cg1B7RyZfFlxixmjIjkcvhLSZIYWu1cFTOBda3SBd+1hwNyM9nc6rId8E07Vf3NLiQBDXczwRU2nwHmE3vtwXd0Xt4rui+aYgAaICOnmC/0vRA2e0Q=
+    - HA_VERSION="$(curl -s 'https://pypi.org/pypi/homeassistant/json' | grep -Po '\"version\"\s*:\s*\"\K[^\"]+')"
+    - REPO_VERSION="$(curl -s 'https://api.github.com/repos/'$TRAVIS_REPO_SLUG'/releases/latest' | grep -Po '\"tag_name\"\s*:\s*\"\K[^\"|\-]+')"
+
+before_script:
+  - docker run --rm --privileged multiarch/qemu-user-static:register --reset
+
+script:
+  - docker build -q -t $TRAVIS_REPO_SLUG:$HA_VERSION .
+  - docker run $TRAVIS_REPO_SLUG:$HA_VERSION hass --version
+
+before_deploy:
+  - if [ "$TRAVIS_EVENT_TYPE" == "cron" ] && [ "$HA_VERSION" == "$REPO_VERSION" ]; then
+      travis_terminate 0;
+    elif [ "$TRAVIS_BRANCH" == "master" ]; then
+      git config --local user.name "Marcos Viní­cius Rubido";
+      git config --local user.email "github@marcosvrs.com";
+      if [ "$HA_VERSION" == "$REPO_VERSION" ]; then
+        git tag $HA_VERSION-$(date +'%Y%m%d%H%M%S');
+      else
+        git tag $HA_VERSION;
+      fi
+    fi
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
+deploy:
+  - provider: script
+    script: docker push $TRAVIS_REPO_SLUG:$HA_VERSION &&
+            docker tag $TRAVIS_REPO_SLUG:$HA_VERSION $TRAVIS_REPO_SLUG &&
+            docker push $TRAVIS_REPO_SLUG &&
+            docker tag $TRAVIS_REPO_SLUG:$HA_VERSION $TRAVIS_REPO_SLUG:latest &&
+            docker push $TRAVIS_REPO_SLUG:latest
+    skip_cleanup: true
+    on:
+      tags: true
+  - provider: releases
+    api_key:
+      secure: sH47irpoWnWLWQe3W+fM7+WVpsA5N5wzMIQcGRDGzW0F3vGOu3H1R7ZaDP4cdl38mrvr2J223PQEtxy++yOv4KQEGJ6oo1pMGm1RioddKTETk8DX77JQqVsfMI9epGFYIRvFyAd2z3SmZ95oe7ZmO8Xcm5ZS8YD9e/tXEZY352Vds5Ast0Q7f6pgZNyiXrtPl/1E+ue1Mi3sGEYtHKGa6UeWdSPdj/Y7SzgWBMXtqv+f8xqjY8EllwCKOEFCUS+K/KIrYBpm0MgjSgn7YRNfHepkkjrSJGPTyg/WFXaMuN1mzzaiAEHB/MNjSb6I2YjXuIS1u6L4BvF+GHYhPXzU304GDI+IakC9qTBdljQrzvOIQ9J00uTYEVCI3/spxN4NYKpPOVQ18vm3QpV3opAJyIxcNNJg1hlcYtydMwo250DY/Q8vQam424XteFDtOMo/9qNQlUCGUinCbaBTKHTvMbK9ggs3wQ4DcG/zSIlKQbRY/tzH4fQb/LPlAFysroKWwXEPZQ0ID3w5ODyBSEExeszX1VyEJFNH0svf/Ae7EqaFec/k/WFkyN5grX26wdSAYcbFcb9z+C8plTZ2BbqAlFmGntHr4wI51v5YS45L7wREd5upWv5dcSl7U02v/xmOBFhyIO5hMjr4MtdUNZ8KhW90MxYjEDPS2IrRBMMOKtE=
+    file: Dockerfile
+    on:
+      branch: master
