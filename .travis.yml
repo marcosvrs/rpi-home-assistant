@@ -1,0 +1,56 @@
+sudo: required
+
+services:
+  - docker
+
+language: bash
+
+env:
+  global:
+    - secure: 7lVvn6CAu3Pxm6loUP1002LaDNv7vB4zzRa8kBlIQwYc9mwouSXvOUvWvrjYldAr9LgUOF5R6AM057lwHtai/7dj5YLzU+vic6xHcQtCHOQ/aup3aPVgDjznYdTwYGu1ERvD0lZzr55dtzpMm1kl3ALETme4p5Kho+sjAqpBNpuVntLL64lwfj0nZG4PM/smopUI6XwKSCZysH/GvjCEMb8cMaJoI9bY5NrJMbbv+vxgeM8PJE86tytew0Lf1W1Y0RcR2QhE0A12kAvrgL32lDZYaCNY7PE1zeqjhlZoEGNxEIeZTW5g83zwvqubfIoSnMpsnnp264WEZC1J2xxINL5Qsd9OyTNtPaEQ2uhY8Kwgk6w+1XvofG6snp5okchplLpNc9JsePCiN1hBR8vKVnqaWCHSUWnlPSJCF/2dBQWlrk9Tl6c+BrgPmGRVfxIOS6/MMec69mW3FOfgHxWNaJLD2Bo7AvbsEeqpLD8mNtldq1sPWnmMYeIWV96I6Cd4rskNb8awCO3InHBWxeO/8Esdu2vgx3MphfkIqxOlBWEKKxQs8m+ahEUDaPb1x9jpqIVLHBE2vxKPx2ee/YHs9tWJcIdc56iHMcwodpU1uwJDH+0B2E8DrXDcBPC0UG1JAgalJoyXeT2H5o5dLKykyBIm9PERuPvOBKkHINhIpSY=
+    - secure: qszMvS7eOfMuvIr8pj597hp6YZaq/1ReToZghmHVjE4KqLT7PDxhoCsSGoc59vcrSNqmS2XCZdlGXVWQx0/HDHqIKv8vJMBZvoUNZdUUZ2ngyy1XFU9VgiYNyV6OzWyZWgJ8mbD2gk4fHOBjWHB1JhEsE8mvFrwR1v/32sB9Ri+HgxTLTs2lgcP1fCkuIP/RbnXl3EQXhGmkxAF6HG/h2eSSdI/pRSa/nk+8Pt52oYcHYhtrFSwMIyEZj2mxujTpxpSb8opP5nLNEv1yjUPh4FWT12bMBYKaTkYSMj5Fo2dlvWE9HW9BYIbFZ8T6WFYzD59Oz0eZK4larNBF2K4sLtcPD9jHAC5fS6Mbjvqypt/3PLdUioLSCktyfrGQB3krNVPjzzlu1dv2BnlI9FaCSVmjVItzBznx1g1TAuwqXCLDsDCF6yRnWvWBqF2YnpjhxIHxW3wi3z8xqSLT1pOzRQWUudn9+cgsxaZhjHxdGwSZPuxDWKCzlv33iwqQttdjfTHJOXKq+4rbwgkn9fn+ZnfyVQhsN73mDwVJLVnR1bA6BlOWGTKW1W5D4cg1B7RyZfFlxixmjIjkcvhLSZIYWu1cFTOBda3SBd+1hwNyM9nc6rId8E07Vf3NLiQBDXczwRU2nwHmE3vtwXd0Xt4rui+aYgAaICOnmC/0vRA2e0Q=
+    - secure: 1u9GZDDm/vNKTK6c+VesqcZDKcJy6J9y1rI0NY9HOZX10naIfKrQtIZ/Nl23qKHXGgbK2OYqsa0+QWOjC8N7vxhk5E51wVRzvR93QZ9mj0/MUZGD1nBa2VEw2IS2tBK7drjGvS01PkBN/xLfOtSKAcG7KHJ2QkrzT39yesaWHhKyC4no9Z3T2lewqXImfwHLlzO0zfhn7jhDqLQVTavMUJjM1/kjp8+3RdWgUCC9H2pN8mugmvxen/JwdFz+55mdGjo3QBTrDnU81m3PbRn3m4N7Bb5LIHoonAnbGSZdY+ZiAFyEpmKNLZTpJ49m2f7WOORXguCFnb5iK6zbaLiwYmyF8DerKpDUhZuoTaZ2dnAjBHMGTtizFSoR0QyLA6JK6VehqrSQuK+dl999Cnb0fUoiW5LrlDpb7QYFsUSG1s3Pd82E1isnHMI66GnIMsMpEtG8AZllY/BZbODK7aJqQ65TmRPz8DrXxD76PHSl8j+a1VaWimmE+jKgctNvi83SuM8sYF86dyoh3NGHHrUqMkR+K7qsK3O91PAWn1aFlinGaDDDlMsZrz431UVNORwg9tKFfbD3zmk3Rn91ybkoqtb1g6MzOmvODyN0kFA9vIbZexWh4JSaC6wVNokCC8RCT0za/6Pcr/jWx+wM9rYZ4U+i4vIMAPc6ltkcmkCXv+U=
+    - HA_VERSION="$(curl 'https://pypi.org/pypi/homeassistant/json' | grep -Po '\"version\"\s*:\s*\"\K[^\"]+')"
+    - REPO_VERSION="$(curl -u ${TRAVIS_REPO_SLUG%/*}:$GITHUB_TOKEN https://api.github.com/repos/$TRAVIS_REPO_SLUG/releases/latest | grep -Po '\"tag_name\"\s*:\s*\"\K[^\"|\-]+')"
+
+before_install:
+  - echo "HA_VERSION=$HA_VERSION"
+  - echo "REPO_VERSION=$REPO_VERSION"
+  - if { [ "$TRAVIS_EVENT_TYPE" == "cron" ] || [ "$TRAVIS_EVENT_TYPE" == "api" ] ;} && [ "$HA_VERSION" == "$REPO_VERSION" ]; then
+      travis_terminate 0;
+    fi
+
+install:
+  - docker run --rm --privileged multiarch/qemu-user-static:register --reset
+
+script:
+  - docker build -t $TRAVIS_REPO_SLUG:$HA_VERSION .
+  - docker run $TRAVIS_REPO_SLUG:$HA_VERSION hass --version
+
+before_deploy:
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then
+      git config --local user.name "Marcos Vinícius Rubido";
+      git config --local user.email "github@marcosvrs.com";
+      if [ "$HA_VERSION" == "$REPO_VERSION" ]; then
+        git tag $HA_VERSION-$(date +'%Y%m%d%H%M%S');
+      else
+        git tag $HA_VERSION;
+      fi
+    fi
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
+deploy:
+  - provider: script
+    script: docker push $TRAVIS_REPO_SLUG:$HA_VERSION &&
+            docker tag $TRAVIS_REPO_SLUG:$HA_VERSION $TRAVIS_REPO_SLUG &&
+            docker push $TRAVIS_REPO_SLUG &&
+            docker tag $TRAVIS_REPO_SLUG:$HA_VERSION $TRAVIS_REPO_SLUG:latest &&
+            docker push $TRAVIS_REPO_SLUG:latest
+    skip_cleanup: true
+    on:
+      tags: true
+  - provider: releases
+    api_key: $GITHUB_TOKEN
+    file: Dockerfile
+    on:
+      branch: master
