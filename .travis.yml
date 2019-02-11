@@ -15,7 +15,9 @@ env:
 before_install:
   - echo "HA_VERSION=$HA_VERSION"
   - echo "REPO_VERSION=$REPO_VERSION"
-  - if { [ "$TRAVIS_EVENT_TYPE" == "cron" ] || [ "$TRAVIS_EVENT_TYPE" == "api" ] ;} && [ "$HA_VERSION" == "$REPO_VERSION" ]; then
+  - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH"
+  - echo "TRAVIS_TAG=$TRAVIS_TAG"
+  - if [ "$TRAVIS_BRANCH" != "$TRAVIS_TAG" ] && { [ "$TRAVIS_EVENT_TYPE" == "cron" ] || [ "$TRAVIS_EVENT_TYPE" == "api" ] ;} && [ "$HA_VERSION" == "$REPO_VERSION" ]; then
       travis_terminate 0;
     fi
 
@@ -27,14 +29,16 @@ script:
   - docker run $TRAVIS_REPO_SLUG:$HA_VERSION hass --version
 
 before_deploy:
-  - if [ "$TRAVIS_BRANCH" == "master" ]; then
+  - |
+    if [ "$TRAVIS_BRANCH" == "master" ]; then
       git config --local user.name "Marcos Vinícius Rubido";
       git config --local user.email "github@marcosvrs.com";
       if [ "$HA_VERSION" == "$REPO_VERSION" ]; then
-        git tag $HA_VERSION-$(date +'%Y%m%d%H%M%S');
+        git tag "$HA_VERSION-$(date +'%Y%m%d%H%M%S')"
       else
-        git tag $HA_VERSION;
+        git tag "$HA_VERSION"
       fi
+      echo "New Tag $(git describe --tags)"
     fi
   - echo "$DOCKER_PASSWORD" | docker login -u "${TRAVIS_REPO_SLUG%/*}" --password-stdin
 

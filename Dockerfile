@@ -1,7 +1,6 @@
 FROM resin/rpi-raspbian:stretch
 LABEL maintainer="Marcos V. Rubido <docker@marcosvrs.com>"
 
-# Base layer
 ENV ARCH=arm
 ENV CROSS_COMPILE=/usr/bin/
 
@@ -13,13 +12,11 @@ RUN apt-get -y update && \
     apt-get -y install --no-install-recommends \
         python3 python3-venv python3-pip libffi-dev python3-dev python3-setuptools \
         python3-lxml libxslt-dev libxml2-dev zlib1g-dev && \
-    apt-get -y autoremove && \
+    apt-get -y remove --auto-remove && \
     apt-get -y clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     pip3 install --no-cache-dir wheel homeassistant
 
-# Mouting point for the user's configuration
-VOLUME /config
+VOLUME [ "/config" ]
 
-# Start Home Assistant
 CMD [ "python3", "-m", "homeassistant", "--config", "/config" ]
