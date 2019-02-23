@@ -34,11 +34,11 @@ before_deploy:
       git config --local user.name "Marcos Vinícius Rubido";
       git config --local user.email "github@marcosvrs.com";
       if [ "$HA_VERSION" == "$REPO_VERSION" ]; then
-        git tag "$HA_VERSION-$(date +'%Y%m%d%H%M%S')"
+        git tag "$HA_VERSION-$(date +'%Y%m%d%H%M%S')";
       else
-        git tag "$HA_VERSION"
+        git tag "$HA_VERSION";
       fi
-      echo "New Tag $(git describe --tags)"
+      echo "New Tag $(git describe --tags)";
     fi
   - echo "$DOCKER_PASSWORD" | docker login -u "${TRAVIS_REPO_SLUG%/*}" --password-stdin
 
