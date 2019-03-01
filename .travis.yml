@@ -18,7 +18,7 @@ before_install:
   - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH"
   - echo "TRAVIS_TAG=$TRAVIS_TAG"
   - if [ "$TRAVIS_BRANCH" != "$TRAVIS_TAG" ] && { [ "$TRAVIS_EVENT_TYPE" == "cron" ] || [ "$TRAVIS_EVENT_TYPE" == "api" ] ;} && [ "$HA_VERSION" == "$REPO_VERSION" ]; then
-      travis_terminate 0;
+    travis_terminate 0;
     fi
 
 install:
@@ -45,10 +45,10 @@ before_deploy:
 deploy:
   - provider: script
     script: docker push $TRAVIS_REPO_SLUG:$HA_VERSION &&
-            docker tag $TRAVIS_REPO_SLUG:$HA_VERSION $TRAVIS_REPO_SLUG &&
-            docker push $TRAVIS_REPO_SLUG &&
-            docker tag $TRAVIS_REPO_SLUG:$HA_VERSION $TRAVIS_REPO_SLUG:latest &&
-            docker push $TRAVIS_REPO_SLUG:latest
+      docker tag $TRAVIS_REPO_SLUG:$HA_VERSION $TRAVIS_REPO_SLUG &&
+      docker push $TRAVIS_REPO_SLUG &&
+      docker tag $TRAVIS_REPO_SLUG:$HA_VERSION $TRAVIS_REPO_SLUG:latest &&
+      docker push $TRAVIS_REPO_SLUG:latest
     skip_cleanup: true
     on:
       tags: true
