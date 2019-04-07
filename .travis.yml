@@ -51,7 +51,7 @@ deploy:
       docker push $TRAVIS_REPO_SLUG:latest
     skip_cleanup: true
     on:
-      tags: true
+      branch: master
   - provider: releases
     api_key: $GITHUB_TOKEN
     file: Dockerfile
