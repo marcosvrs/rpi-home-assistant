@@ -35,9 +35,9 @@ before_deploy:
       git config --local user.name "Marcos Vinícius Rubido";
       git config --local user.email "github@marcosvrs.com";
       if [ "$REPO_VERSION" == "$HA_VERSION" ]; then
-        git tag -f "$HA_VERSION-$(date +'%Y%m%d%H%M%S')";
+        git tag -a -f "$HA_VERSION-$(date +'%Y%m%d%H%M%S')" -m "Version $HA_VERSION";
       else
-        git tag -f "$HA_VERSION";
+        git tag -a -f "$HA_VERSION" -m "Version $HA_VERSION";
       fi
       echo "New Tag $(git describe --tags)";
     fi
