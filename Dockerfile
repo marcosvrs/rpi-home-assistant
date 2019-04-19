@@ -12,10 +12,12 @@ RUN apt-get -y update && \
     apt-get -y install --no-install-recommends \
         python3 python3-venv python3-pip libffi-dev python3-dev python3-setuptools \
         python3-lxml libxslt-dev libxml2-dev zlib1g-dev && \
+    useradd -rm homeassistant -G dialout,gpio && \
     apt-get -y remove --auto-remove && \
     apt-get -y clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-    pip3 install --no-cache-dir wheel homeassistant
+    python3 -m pip install wheel && \
+    pip3 install --no-cache-dir homeassistant
 
 VOLUME [ "/config" ]
 
