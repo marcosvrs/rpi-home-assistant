@@ -10,13 +10,13 @@ ENV CROSS_COMPILE=/usr/bin/
 RUN apt-get -y update && \
     apt-get -y upgrade && \
     apt-get -y install --no-install-recommends \
-        python3 python3-venv python3-pip libffi-dev python3-dev python3-setuptools \
+        build-essential libssl-dev python3 python3-venv python3-pip libffi-dev python3-dev python3-setuptools \
         python3-lxml libxslt-dev libxml2-dev zlib1g-dev && \
     useradd -rm homeassistant -G dialout && \
     apt-get -y remove --auto-remove && \
     apt-get -y clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-    python3 -m pip install wheel && \
+    python3 -m pip --default-timeout=1000 install wheel && \
     pip3 install --no-cache-dir homeassistant
 
 VOLUME [ "/config" ]
