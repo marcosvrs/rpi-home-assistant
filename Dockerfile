@@ -16,7 +16,10 @@ RUN apt-get -y update && \
     apt-get -y remove --auto-remove && \
     apt-get -y clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-    python3 -m pip install wheel && \
+    python3 -m venv homeassistant && \
+    cd homeassistant && \
+    source bin/activate && \
+    python3 -m pip install --no-cache-dir wheel && \
     python3 -m pip install --no-cache-dir homeassistant
 
 VOLUME [ "/config" ]
