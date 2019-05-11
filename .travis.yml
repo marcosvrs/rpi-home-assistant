@@ -51,6 +51,5 @@ deploy:
       tags: true
   - provider: releases
     api_key: $GITHUB_TOKEN
-    file: Dockerfile
     on:
       branch: master
