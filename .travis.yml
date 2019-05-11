@@ -1,9 +1,7 @@
-sudo: required
+language: python
 
 services:
   - docker
-
-language: bash
 
 env:
   global:
@@ -12,7 +10,7 @@ env:
     - HA_VERSION="$(curl 'https://pypi.org/pypi/homeassistant/json' | grep -Po '\"version\"\s*:\s*\"\K[^\"]+')"
     - REPO_VERSION="$(curl -u ${TRAVIS_REPO_SLUG%/*}:$GITHUB_TOKEN https://api.github.com/repos/$TRAVIS_REPO_SLUG/releases/latest | grep -Po '\"tag_name\"\s*:\s*\"\K[^\"|\-]+')"
 
-before_install:
+before_script:
   - echo "HA_VERSION=$HA_VERSION"
   - echo "REPO_VERSION=$REPO_VERSION"
   - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH"
@@ -22,10 +20,8 @@ before_install:
       travis_terminate 0;
     fi
 
-install:
-  - docker run --rm --privileged multiarch/qemu-user-static:register --reset
-
 script:
+  - docker run --rm --privileged multiarch/qemu-user-static:register --reset
   - docker build -t $TRAVIS_REPO_SLUG:$HA_VERSION .
   - docker run $TRAVIS_REPO_SLUG:$HA_VERSION hass --version
 

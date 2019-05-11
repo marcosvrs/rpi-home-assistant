@@ -17,7 +17,7 @@ RUN apt-get -y update && \
     apt-get -y clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     python3 -m pip install wheel && \
-    pip3 --default-timeout=3600 install --no-cache-dir homeassistant
+    python3 -m pip install --no-cache-dir homeassistant
 
 VOLUME [ "/config" ]
 
