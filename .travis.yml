@@ -18,7 +18,7 @@ before_script:
   - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH"
   - echo "TRAVIS_TAG=$TRAVIS_TAG"
   - |
-    if {[ "$TRAVIS_EVENT_TYPE" == "cron" ] || [ "$TRAVIS_EVENT_TYPE" == "api" ]} && [ "$REPO_VERSION" == "$HA_VERSION" ]; then
+    if [[ "$REPO_VERSION" == "$HA_VERSION" && ( "$TRAVIS_EVENT_TYPE" == "cron" || "$TRAVIS_EVENT_TYPE" == "api" ) ]]; then
       travis_terminate 0;
     fi
 
@@ -29,8 +29,8 @@ script:
 
 before_deploy:
   - |
-    if [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then
-      if [ "$REPO_VERSION" == "$HA_VERSION" ]; then
+    if [[ "$TRAVIS_PULL_REQUEST" == "false" && "$TRAVIS_BRANCH" == "master" ]]; then
+      if [[ "$REPO_VERSION" == "$HA_VERSION" ]]; then
         git tag -f "$HA_VERSION-$(date +'%Y%m%d%H%M%S')";
       else
         git tag -f "$HA_VERSION";
