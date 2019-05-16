@@ -1,4 +1,4 @@
-FROM resin/rpi-raspbian:stretch
+FROM balenalib/rpi-raspbian:stretch
 LABEL maintainer="Marcos V. Rubido <docker@marcosvrs.com>"
 
 ENV ARCH=arm
