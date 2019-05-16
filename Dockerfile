@@ -1,4 +1,4 @@
-FROM resin/rpi-raspbian:stretch
+FROM balenalib/rpi-raspbian:stretch
 LABEL maintainer="Marcos V. Rubido <docker@marcosvrs.com>"
 
 ENV ARCH=arm
@@ -12,6 +12,7 @@ WORKDIR /usr/src/app
 # #1:   20190130 - Added python3, python3-venv, python3-pip, libffi-dev, python3-dev and python3-setuptools for https://www.home-assistant.io/docs/installation/raspberry-pi/
 # #2:   20190130 - Added python3-lxml, libxslt-dev, libxml2-dev and zlib1g-dev for https://www.home-assistant.io/components/device_tracker.fritz/
 RUN apt-get update && \
+    apt-get -y upgrade && \
     apt-get install -y --no-install-recommends \
         build-essential libssl-dev python3 python3-venv python3-pip libffi-dev python3-dev python3-setuptools \
         python3-lxml libxslt-dev libxml2-dev zlib1g-dev && \
